@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class DynamicTerrain2D : MonoBehaviour {
 
@@ -8,9 +9,11 @@ public class DynamicTerrain2D : MonoBehaviour {
 
 	public void RefreshTerrain ()
 	{
-		if (LevelOfDetail < 1)
+		if (LevelOfDetail < 1 || Height <= 0 || SurfacePoints.Length < 2) {
+			Debug.LogError ("Generate terrain failed: LevelOfDetail < 1 or Height <= 0 or SurfacePoints.Length < 2");
 			return;
-		
+		}
+
 		Mesh mesh;
 		mesh = new Mesh ();
 		gameObject.GetComponent<MeshFilter> ().mesh = mesh;
@@ -23,7 +26,7 @@ public class DynamicTerrain2D : MonoBehaviour {
 			for (int j = 0; j <= LevelOfDetail; j++) {
 				Vector3 nextPosDir = SurfacePoints [i + 1] - SurfacePoints [i];
 
-				//Smooth y axie of points
+				//Smooth y of points
 				float yc = easeInOutSine (SurfacePoints [i].y, SurfacePoints [i + 1].y,  (float)(j) / LevelOfDetail);
 				nextPosDir *= (float)(j) / LevelOfDetail;
 				nextPosDir = new Vector3 (nextPosDir.x, yc, nextPosDir.z);
@@ -65,7 +68,7 @@ public class DynamicTerrain2D : MonoBehaviour {
 		mesh.RecalculateNormals ();
 
 
-		// Generate poltgon colloder
+		// Generate polygon colloder
 		Vector2[] colPoints = new Vector2[upper_verts.Length+bottom_verts.Length];
 		for (int i = 0,j=bottom_verts.Length-1; i < upper_verts.Length; i++,j--) {
 			//upper points
