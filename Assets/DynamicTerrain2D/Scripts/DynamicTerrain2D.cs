@@ -3,9 +3,16 @@ using System.Collections.Generic;
 
 public class DynamicTerrain2D : MonoBehaviour {
 
-	public Vector2[] SurfacePoints;
+	[Header("Terrain Parameters")]
+
+	[Range(1,20)]
 	public int LevelOfDetail = 1;
+	[Range(1,30)]
 	public float Height = 1;
+	[Range(1,100)]
+	public float TextureScaling = 1;
+	[Tooltip("Size of points should > 2")]
+	public Vector2[] SurfacePoints;
 
 	public void RefreshTerrain ()
 	{
@@ -27,7 +34,7 @@ public class DynamicTerrain2D : MonoBehaviour {
 				Vector3 nextPosDir = SurfacePoints [i + 1] - SurfacePoints [i];
 
 				//Smooth y of points
-				float yc = easeInOutSine (SurfacePoints [i].y, SurfacePoints [i + 1].y,  (float)(j) / LevelOfDetail);
+				float yc = InOutSine (SurfacePoints [i].y, SurfacePoints [i + 1].y,  (float)(j) / LevelOfDetail);
 				nextPosDir *= (float)(j) / LevelOfDetail;
 				nextPosDir = new Vector3 (nextPosDir.x, yc, nextPosDir.z);
 
@@ -58,7 +65,7 @@ public class DynamicTerrain2D : MonoBehaviour {
 		bottom_verts.CopyTo (verts,upper_verts.Length);
 
 		for (int i=0; i < uvs.Length;i++) {
-			uvs [i] = new Vector2 (verts [i].x, verts [i].y);
+			uvs [i] = new Vector2 (verts [i].x/TextureScaling, verts [i].y/TextureScaling);
 		}
 
 		mesh.Clear ();
@@ -80,9 +87,9 @@ public class DynamicTerrain2D : MonoBehaviour {
 	}
 
 
-	float easeInOutSine(float start, float end, float val){
+	float InOutSine(float start, float end, float ratio){
 		end -= start;
-		return -end / 2 * (Mathf.Cos(Mathf.PI * val / 1) - 1);
+		return -end / 2 * (Mathf.Cos(Mathf.PI * ratio / 1) - 1);
 	}
 
 }
